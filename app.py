@@ -45,6 +45,18 @@ def get_current_time(input: str) -> str:
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
+def reverse_string(text: str) -> str:
+    """Reverse the given string.
+
+    Args:
+        text: The string to reverse.
+
+    Returns:
+        The input string reversed.
+    """
+    return text[::-1]
+
+
 def main() -> None:
     """Main entrypoint for the application.
 
@@ -76,19 +88,19 @@ def main() -> None:
     print("🤖 ChatOpenAI model initialized.")
 
     tools = [
-        Tool(
-            name="Calculator",
-            func=calculator,
-            description="Use this tool to evaluate mathematical expressions. "
-            "Pass a valid math expression as a string (e.g., '25 * 4 + 10'). "
-            "Returns the computed result. Use this whenever the user asks a math question.",
-        ),
-        Tool(
-            name="get_current_time",
-            func=get_current_time,
-            description="Use this tool to get the current date and time. "
-            "Use this whenever the user asks what time or date it is.",
-        ),
+        # Tool(
+        #     name="Calculator",
+        #     func=calculator,
+        #     description="Use this tool to evaluate mathematical expressions. "
+        #     "Pass a valid math expression as a string (e.g., '25 * 4 + 10'). "
+        #     "Returns the computed result. Use this whenever the user asks a math question.",
+        # ),
+        # Tool(
+        #     name="get_current_time",
+        #     func=get_current_time,
+        #     description="Use this tool to get the current date and time. "
+        #     "Use this whenever the user asks what time or date it is.",
+        # ),
     ]
 
     print(f"🛠️ Tools registered: {[t.name for t in tools]}")
@@ -105,8 +117,8 @@ def main() -> None:
 
     print("🤖 Agent created successfully.")
 
-    # Test query — agent has no tools, so it will answer on its own
-    query = "What time is it right now?"
+    # Test query — agent has no tools, so it will attempt this on its own
+    query = "Reverse the string 'Hello World'"
     print(f"\n🧪 Sending test query: {query}")
 
     try:
