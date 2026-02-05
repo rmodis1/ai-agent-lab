@@ -1,7 +1,7 @@
 ---  
-agent: ask  
+agent: agent  
 description: A detailed GitHub-style prompt guiding code generation and review for Python projects. Includes structure, naming, error handling, security, testing, examples, and expectations.  
-model: gpt-5-mini  
+model: GPT-5 mini (copilot)
 ---
 
 # Copilot / Assistant Prompt — Python Best Practices
