@@ -33,6 +33,18 @@ def calculator(expression: str) -> str:
         return f"Error evaluating expression: {e}"
 
 
+def get_current_time(input: str) -> str:
+    """Return the current date and time as a formatted string.
+
+    Args:
+        input: Not used — required by the Tool interface.
+
+    Returns:
+        The current date and time in YYYY-MM-DD HH:MM:SS format.
+    """
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
 def main() -> None:
     """Main entrypoint for the application.
 
@@ -71,6 +83,12 @@ def main() -> None:
             "Pass a valid math expression as a string (e.g., '25 * 4 + 10'). "
             "Returns the computed result. Use this whenever the user asks a math question.",
         ),
+        Tool(
+            name="get_current_time",
+            func=get_current_time,
+            description="Use this tool to get the current date and time. "
+            "Use this whenever the user asks what time or date it is.",
+        ),
     ]
 
     print(f"🛠️ Tools registered: {[t.name for t in tools]}")
@@ -87,8 +105,8 @@ def main() -> None:
 
     print("🤖 Agent created successfully.")
 
-    # Test query — agent will use tools to answer
-    query = "What is 25 * 4 + 10?"
+    # Test query — agent has no tools, so it will answer on its own
+    query = "What time is it right now?"
     print(f"\n🧪 Sending test query: {query}")
 
     try:
