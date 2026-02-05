@@ -5,9 +5,32 @@ This script initializes environment variables via python-dotenv and
 provides a simple `main()` function as the program entrypoint.
 """
 
+from datetime import datetime
 from dotenv import load_dotenv
+from langchain.agents import AgentExecutor, create_tool_calling_agent
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.tools import Tool
 from langchain_openai import ChatOpenAI
 import os
+
+
+def calculator(expression: str) -> str:
+    """Evaluate a mathematical expression and return the result.
+
+    Uses Python's eval() for demonstration purposes only.
+    WARNING: eval() is unsafe with untrusted input — do not use in production.
+
+    Args:
+        expression: A string containing a mathematical expression (e.g., "25 * 4 + 10").
+
+    Returns:
+        The result as a string, or an error message if evaluation fails.
+    """
+    try:
+        result = eval(expression)
+        return str(result)
+    except Exception as e:
+        return f"Error evaluating expression: {e}"
 
 
 def main() -> None:
@@ -40,12 +63,39 @@ def main() -> None:
 
     print("🤖 ChatOpenAI model initialized.")
 
-    # Test query — the LLM will answer on its own without tools
+    tools = [
+        Tool(
+            name="Calculator",
+            func=calculator,
+            description="Use this tool to evaluate mathematical expressions. "
+            "Pass a valid math expression as a string (e.g., '25 * 4 + 10'). "
+            "Returns the computed result. Use this whenever the user asks a math question.",
+        ),
+    ]
+
+    print(f"🛠️ Tools registered: {[t.name for t in tools]}")
+
+    # Create agent with tools
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", "You are a helpful assistant. Use your tools to answer questions. "
+         "Always respond in plain text — never use LaTeX or markdown formatting."),
+        ("human", "{input}"),
+        MessagesPlaceholder(variable_name="agent_scratchpad"),
+    ])
+    agent = create_tool_calling_agent(llm=llm, tools=tools, prompt=prompt)
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=False)
+
+    print("🤖 Agent created successfully.")
+
+    # Test query — agent will use tools to answer
     query = "What is 25 * 4 + 10?"
     print(f"\n🧪 Sending test query: {query}")
 
-    response = llm.invoke(query)
-    print(f"💬 Response: {response.content}")
+    try:
+        result = agent_executor.invoke({"input": query})
+        print(f"\n💬 Result: {result['output']}")
+    except Exception as e:
+        print(f"\n❌ Error running agent: {e}")
 
 
 if __name__ == "__main__":
