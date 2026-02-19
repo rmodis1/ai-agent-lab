@@ -57,6 +57,25 @@ def reverse_string(text: str) -> str:
     return text[::-1]
 
 
+def get_weather(date: str) -> str:
+    """Return mock weather information for a given date.
+
+    Args:
+        date: A date string in YYYY-MM-DD format.
+
+    Returns:
+        A weather description string. Returns sunny weather for today's
+        date and rainy weather for all other dates.
+    """
+    try:
+        today = datetime.now().strftime("%Y-%m-%d")
+        if date.strip() == today:
+            return "Sunny, 72°F"
+        return "Rainy, 55°F"
+    except Exception as e:
+        return f"Error getting weather: {e}"
+
+
 def main() -> None:
     """Main entrypoint for the application.
 
@@ -88,26 +107,40 @@ def main() -> None:
     print("🤖 ChatOpenAI model initialized.")
 
     tools = [
-        # Tool(
-        #     name="Calculator",
-        #     func=calculator,
-        #     description="Use this tool to evaluate mathematical expressions. "
-        #     "Pass a valid math expression as a string (e.g., '25 * 4 + 10'). "
-        #     "Returns the computed result. Use this whenever the user asks a math question.",
-        # ),
-        # Tool(
-        #     name="get_current_time",
-        #     func=get_current_time,
-        #     description="Use this tool to get the current date and time. "
-        #     "Use this whenever the user asks what time or date it is.",
-        # ),
+        Tool(
+            name="Calculator",
+            func=calculator,
+            description="Use this tool to evaluate mathematical expressions. "
+            "Pass a valid math expression as a string (e.g., '25 * 4 + 10'). "
+            "Returns the computed result. Use this whenever the user asks a math question.",
+        ),
+        Tool(
+            name="get_current_time",
+            func=get_current_time,
+            description="Use this tool to get the current date and time. "
+            "Use this whenever the user asks what time or date it is.",
+        ),
+        Tool(
+            name="reverse_string",
+            func=reverse_string,
+            description="Reverses a string. Input should be a single string.",
+        ),
+        Tool(
+            name="get_weather",
+            func=get_weather,
+            description="Returns weather information for a given date. "
+            "Input should be a date formatted as YYYY-MM-DD. "
+            "Use get_current_time first to get today's date if needed.",
+        ),
     ]
 
     print(f"🛠️ Tools registered: {[t.name for t in tools]}")
 
     # Create agent with tools
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are a helpful assistant. Use your tools to answer questions. "
+        ("system", "You are a professional and succinct assistant. "
+         "Use your tools to answer questions accurately. "
+         "Keep responses brief and to the point. "
          "Always respond in plain text — never use LaTeX or markdown formatting."),
         ("human", "{input}"),
         MessagesPlaceholder(variable_name="agent_scratchpad"),
@@ -117,15 +150,26 @@ def main() -> None:
 
     print("🤖 Agent created successfully.")
 
-    # Test query — agent has no tools, so it will attempt this on its own
-    query = "Reverse the string 'Hello World'"
-    print(f"\n🧪 Sending test query: {query}")
+    # Test queries — one for each tool
+    queries = [
+        "What time is it right now?",
+        "What is 25 * 4 + 10?",
+        "Reverse the string 'Hello World'",
+        "What's the weather like today?",
+    ]
 
-    try:
-        result = agent_executor.invoke({"input": query})
-        print(f"\n💬 Result: {result['output']}")
-    except Exception as e:
-        print(f"\n❌ Error running agent: {e}")
+    print("\n🧪 Running example queries:\n")
+    for query in queries:
+        print("─" * 50)
+        print(f"📝 Query: {query}\n")
+        try:
+            result = agent_executor.invoke({"input": query})
+            print(f"✅ Result: {result['output']}\n")
+        except Exception as e:
+            print(f"❌ Error: {e}\n")
+
+    print("─" * 50)
+    print("🎉 Agent demo complete!")
 
 
 if __name__ == "__main__":

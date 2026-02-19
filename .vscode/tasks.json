@@ -1,0 +1,37 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Create venv",
+      "type": "shell",
+      "command": "python3 -m venv .venv",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Install requirements",
+      "type": "shell",
+      "command": ".venv/bin/python -m pip install --upgrade pip && .venv/bin/python -m pip install -r requirements.txt",
+      "problemMatcher": [],
+      "dependsOn": "Create venv",
+      "group": "build"
+    },
+    {
+      "label": "Run app",
+      "type": "shell",
+      "command": ".venv/bin/python app.py",
+      "problemMatcher": [],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Run pytest",
+      "type": "shell",
+      "command": ".venv/bin/python -m pytest -q",
+      "problemMatcher": ["$pytest"],
+      "group": "test"
+    }
+  ]
+}
